@@ -1,6 +1,6 @@
 ( function( $ ) {
 
-    $( document ).on( 'ready', function() {
+    $( document ).on( 'rbm-field-helpers-ready', function() {
 
         var $repeater = rbmFHgetFieldObject( 'rbm_cpts_radio_show_times', 'rbm_cpts', 'repeater' );
 

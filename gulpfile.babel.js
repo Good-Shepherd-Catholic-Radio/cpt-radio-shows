@@ -101,7 +101,7 @@ function sass() {
 			$.if( PRODUCTION, $.cleanCss( { compatibility: 'ie9' } ) )
 		)
 		.pipe(
-			$.if( ! PRODUCTION, $.sourcemaps.write() )
+			$.if( ! PRODUCTION, $.sourcemaps.write( '.' ) )
 		)
 		.pipe(
 			$.if( REVISIONING && PRODUCTION || REVISIONING && DEV, $.rev() )
@@ -122,6 +122,7 @@ function sass() {
 // In production, the file is minified
 const webpack = {
   config: {
+    devtool: 'inline-source-map',
     module: {
       rules: [
         {
@@ -145,13 +146,17 @@ const webpack = {
   },
 
   build() {
+
     return gulp.src(PATHS.entries.js, { allowEmpty: true } )
       .pipe(named())
       .pipe(webpackStream(webpack.config, webpack2))
-      .pipe($.uglify())
-      .pipe($.if(REVISIONING && PRODUCTION || REVISIONING && DEV, $.rev()))
-      .pipe(gulp.dest(PATHS.dist + '/assets/js'))
-      .pipe($.if(REVISIONING && PRODUCTION || REVISIONING && DEV, $.rev.manifest()))
+      .pipe($.sourcemaps.init( { loadMaps: true }))
+      .pipe($.uglify()
+          .on('error', e => {
+              console.log(e);
+          })
+      )
+      .pipe($.if(!PRODUCTION, $.sourcemaps.write('.' )))
       .pipe(gulp.dest(PATHS.dist + '/assets/js'));
   },
 
